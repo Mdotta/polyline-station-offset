@@ -1,0 +1,25 @@
+# Python / project artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual envs
+venv/
+.env/
+.venv/
+
+# Git
+.git
+.gitignore
+
+# Test & build caches
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+.DS_Store
