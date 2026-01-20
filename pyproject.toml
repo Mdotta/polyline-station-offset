@@ -13,6 +13,9 @@ authors = [
     {name = "Mdotta"}
 ]
 
+[project.scripts]
+station-offset = "station_offset.__main__:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
