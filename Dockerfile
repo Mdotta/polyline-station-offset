@@ -25,8 +25,8 @@ RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.
 # Copy the rest of the project
 COPY . /app
 
-# Make the package importable from /app/src
-ENV PYTHONPATH=/app/src
+# Install the package in editable mode to make CLI available
+RUN pip install -e .
 
 # Default command is to run the test suite (evaluator can override)
 CMD ["pytest", "-q"]
