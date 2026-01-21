@@ -4,6 +4,7 @@ import argparse
 import sys
 from typing import Optional
 
+from . import __version__
 from .core import compute_station_offset
 from .io import read_polyline
 
@@ -47,7 +48,7 @@ Examples:
     parser.add_argument(
         "--version",
         action="version",
-        version="%(prog)s 0.1.0",
+        version=f"%(prog)s {__version__}",
     )
     parser.add_argument(
         "-v",
@@ -62,31 +63,20 @@ Examples:
         # Read polyline from CSV
         polyline = read_polyline(args.polyline)
 
-        if not polyline:
-            print(f"Error: Polyline file '{args.polyline}' is empty", file=sys.stderr)
-            return 1
-
-        if len(polyline) < 2:
-            print(
-                f"Error: Polyline must have at least 2 points, found {len(polyline)}",
-                file=sys.stderr,
-            )
-            return 1
-
         # Compute station and offset
         point = (args.x, args.y)
-        station, offset, closest_point = compute_station_offset(polyline, point)
+        result = compute_station_offset(polyline, point)
 
         # Output results
         if args.verbose:
             print(f"Polyline: {len(polyline)} points")
             print(f"Query point: ({args.x}, {args.y})")
-            print(f"Station: {station:.6f}")
-            print(f"Offset: {offset:.6f}")
-            print(f"Closest point: ({closest_point[0]:.6f}, {closest_point[1]:.6f})")
+            print(f"Station: {result.station:.6f}")
+            print(f"Offset: {result.offset:.6f}")
+            print(f"Closest point: ({result.closest_point[0]:.6f}, {result.closest_point[1]:.6f})")
         else:
-            print(f"Station: {station:.6f}")
-            print(f"Offset: {offset:.6f}")
+            print(f"Station: {result.station:.6f}")
+            print(f"Offset: {result.offset:.6f}")
 
         return 0
 
@@ -94,7 +84,7 @@ Examples:
         print(f"Error: Polyline file '{args.polyline}' not found", file=sys.stderr)
         return 1
     except ValueError as e:
-        print(f"Error: Invalid data in polyline file: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

@@ -1,18 +1,41 @@
 """Core functions for station/offset calculation."""
 
-from typing import List, Tuple
-
-import numpy as np
+import math
+from typing import List, NamedTuple, Tuple
 
 Point = Tuple[float, float]
 Polyline = List[Point]
 
 
-def compute_station_offset(polyline: Polyline, point: Point) -> Tuple[float, float, Point]:
+class StationOffsetResult(NamedTuple):
+    """Result of station/offset calculation."""
+
+    station: float
+    offset: float
+    closest_point: Point
+
+
+def compute_station_offset(polyline: Polyline, point: Point) -> StationOffsetResult:
     """
     Compute station and offset for `point` relative to `polyline`.
-    Returns a tuple of (station, offset, closest_point_on_polyline).
+
+    Args:
+        polyline: List of (x, y) coordinate tuples defining the polyline.
+                  Must contain at least 2 points.
+        point: (x, y) coordinate tuple of the query point.
+
+    Returns:
+        StationOffsetResult with station, offset, and closest_point fields.
+
+    Raises:
+        ValueError: If polyline is empty or has fewer than 2 points.
     """
+    if not polyline:
+        raise ValueError("Polyline cannot be empty")
+
+    if len(polyline) < 2:
+        raise ValueError(f"Polyline must have at least 2 points, got {len(polyline)}")
+
     best_squared_distance = float("inf")
 
     closest_station = 0.0
@@ -32,7 +55,7 @@ def compute_station_offset(polyline: Polyline, point: Point) -> Tuple[float, flo
 
         squared_distance = _get_squared_distance(point, segment_closest_point)
 
-        segment_length = np.sqrt(segment_vector[0] ** 2 + segment_vector[1] ** 2)
+        segment_length = math.sqrt(segment_vector[0] ** 2 + segment_vector[1] ** 2)
 
         segment_station = cumulative_station + (projection_length_clamped * segment_length)
 
@@ -42,9 +65,9 @@ def compute_station_offset(polyline: Polyline, point: Point) -> Tuple[float, flo
             closest_point = segment_closest_point
         cumulative_station += segment_length
 
-    closest_offset = np.sqrt(best_squared_distance)
+    closest_offset = math.sqrt(best_squared_distance)
 
-    return (closest_station, closest_offset, closest_point)
+    return StationOffsetResult(closest_station, closest_offset, closest_point)
 
 
 def _get_squared_distance(p1: Point, p2: Point) -> float:
@@ -71,11 +94,11 @@ def _get_projection_length(segment_vector: Point, point_vector: Point) -> float:
     """
     Calculate the projection length of point_vector onto segment_vector.
     """
-    dot_segment = np.dot(segment_vector, segment_vector)
+    dot_segment = segment_vector[0] * segment_vector[0] + segment_vector[1] * segment_vector[1]
     if dot_segment == 0:
         return 0.0
 
-    dot_product = np.dot(segment_vector, point_vector)
+    dot_product = segment_vector[0] * point_vector[0] + segment_vector[1] * point_vector[1]
 
     projection_length = dot_product / dot_segment
 
