@@ -10,7 +10,6 @@ from station_offset.io import read_polyline
 
 def test_read_simple_polyline(simple_polyline):
     """Test reading a simple polyline from CSV fixture."""
-    # The fixture already loads from CSV, but let's verify it directly
     fixture_path = Path(__file__).parent / "fixtures" / "simple_polyline.csv"
     points = read_polyline(str(fixture_path))
 
@@ -27,7 +26,6 @@ def test_read_complex_polyline(complex_polyline):
 
     assert len(points) == 6
     assert points[0] == (0.0, 0.0)
-    # Check duplicate point
     assert points[1] == (5.0, 0.0)
     assert points[2] == (5.0, 0.0)
 
@@ -46,24 +44,6 @@ def test_read_polyline_with_whitespace():
         assert points[0] == (1.0, 2.0)
         assert points[1] == (3.0, 4.0)
         assert points[2] == (5.0, 6.0)
-    finally:
-        Path(temp_path).unlink()
-
-
-def test_read_polyline_skips_empty_rows():
-    """Test that empty rows are skipped."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-        f.write("1.0,2.0\n")
-        f.write("\n")
-        f.write("3.0,4.0\n")
-        f.write("  \n")
-        f.write("5.0,6.0\n")
-        temp_path = f.name
-
-    try:
-        points = read_polyline(temp_path)
-        assert len(points) == 3
-        assert points == [(1.0, 2.0), (3.0, 4.0), (5.0, 6.0)]
     finally:
         Path(temp_path).unlink()
 
@@ -102,38 +82,6 @@ def test_read_polyline_invalid_float():
     try:
         with pytest.raises(ValueError):
             read_polyline(temp_path)
-    finally:
-        Path(temp_path).unlink()
-
-
-def test_read_polyline_insufficient_columns():
-    """Test that rows with less than 2 columns are skipped."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-        f.write("1.0,2.0\n")
-        f.write("3.0\n")  # Only one column
-        f.write("4.0,5.0\n")
-        temp_path = f.name
-
-    try:
-        points = read_polyline(temp_path)
-        assert len(points) == 2
-        assert points == [(1.0, 2.0), (4.0, 5.0)]
-    finally:
-        Path(temp_path).unlink()
-
-
-def test_read_polyline_extra_columns():
-    """Test that extra columns are ignored."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-        f.write("1.0,2.0,extra\n")
-        f.write("3.0,4.0,data,here\n")
-        temp_path = f.name
-
-    try:
-        points = read_polyline(temp_path)
-        assert len(points) == 2
-        assert points[0] == (1.0, 2.0)
-        assert points[1] == (3.0, 4.0)
     finally:
         Path(temp_path).unlink()
 

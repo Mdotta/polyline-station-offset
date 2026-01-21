@@ -2,22 +2,10 @@
 
 A Python tool to compute **Station** and **Offset** between a point and a polyline.
 
-> **Note:** This is a technical challenge submission demonstrating professional Python project structure, testing practices, and reproducible development environment setup.
-
 ## What It Does
 
 - **Offset**:  The shortest perpendicular distance from a point to a polyline
 - **Station**: The distance along the polyline from its start to where the shortest perpendicular intersects
-
-## Project Status
-
-- [x] Project skeleton created
-- [x] Test fixtures and smoke test added
-- [x] Pre-commit hooks configured
-- [x] Docker environment ready
-- [x] Core algorithm implemented
-- [x] CLI interface implemented
-- [x] Comprehensive test coverage (32 tests)
 
 ## Requirements
 
@@ -187,12 +175,6 @@ For each segment in the polyline:
 6. Compute cumulative distance along polyline to the closest point (Station)
 
 **Complexity:** O(n) where n = number of segments
-
-**Key Implementation Details:**
-- Uses dot products for vector projection
-- Avoids expensive square root operations until final offset calculation
-- Handles degenerate segments (zero-length) gracefully
-- Works with negative coordinates and arbitrary polyline shapes
 
 ## Usage Examples
 
